@@ -8,7 +8,10 @@
 </head>
 <body>
     <div class="container">
-        <h1>Track Your Parcel</h1>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>Track Your Parcel</h1>
+            <a href="/login.html" style="padding: 8px 16px; background: #2563eb; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">Staff Login</a>
+        </div>
         <div style="display: flex; gap: 10px;">
             <input type="text" id="tracking-input" placeholder="Enter Tracking ID (e.g. CT-123456)">
             <button onclick="trackOrder()" style="width: 150px;">Track</button>
