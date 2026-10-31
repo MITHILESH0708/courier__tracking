@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Courier Tracking</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container" style="max-width: 400px; margin-top: 100px;">
+        <h2>Login</h2>
+        <form id="login-form">
+            <label>Email</label>
+            <input type="email" id="email" required value="admin@test.com">
+            <label>Password</label>
+            <input type="password" id="password" required value="password123">
+            <button type="submit">Login</button>
+            <p id="error-msg" style="color: red;"></p>
+        </form>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const data = await apiCall('/auth/login', 'POST', {
+                    email: document.getElementById('email').value,
+                    password: document.getElementById('password').value
+                });
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('role', data.role);
+                window.location.href = data.role === 'admin' ? '/admin.html' : '/courier.html';
+            } catch (err) {
+                document.getElementById('error-msg').textContent = err.message;
+            }
+        });
+    </script>
+</body>
+</html>

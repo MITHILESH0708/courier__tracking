@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Track Parcel</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+    <div class="container">
+        <h1>Track Your Parcel</h1>
+        <div style="display: flex; gap: 10px;">
+            <input type="text" id="tracking-input" placeholder="Enter Tracking ID (e.g. CT-123456)">
+            <button onclick="trackOrder()" style="width: 150px;">Track</button>
+        </div>
+
+        <div id="order-details" style="display: none;">
+            <div class="grid-2">
+                <div>
+                    <h3>Status: <span id="ui-status" class="badge"></span></h3>
+                    <p><strong>ETA:</strong> <span id="ui-eta">Calculating...</span></p>
+                    <p><strong>Courier:</strong> <span id="ui-courier"></span></p>
+                    <ul class="timeline" id="ui-timeline" style="margin-top: 15px;"></ul>
+                </div>
+                <div>
+                    <div id="map" class="map-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Chatbot UI -->
+    <button id="chatbot-btn">💬</button>
+    <div id="chatbot-window">
+        <div id="chatbot-header">Courier AI Support 🤖</div>
+        <div id="chat-messages">
+            <div class="msg bot">Hi! Enter a tracking ID on the page, then ask me anything about your delivery.</div>
+        </div>
+        <div id="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Type a message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/tracking.js"></script>
+    <script src="js/chatbot.js"></script>
+</body>
+</html>

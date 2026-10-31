@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+    <div class="container">
+        <div style="display: flex; justify-content: space-between;">
+            <h1>Admin Dashboard</h1>
+            <button class="btn-secondary" onclick="logout()" style="width: 100px;">Logout</button>
+        </div>
+
+        <div class="grid-2">
+            <div>
+                <h3>Create Order</h3>
+                <form id="create-order-form">
+                    <input type="text" id="s-name" placeholder="Sender Name" required>
+                    <input type="text" id="r-name" placeholder="Receiver Name" required>
+                    <input type="text" id="p-addr" placeholder="Pickup Address" required>
+                    <input type="number" id="p-lat" placeholder="Pickup Lat" step="any" required>
+                    <input type="number" id="p-lng" placeholder="Pickup Lng" step="any" required>
+                    <input type="text" id="d-addr" placeholder="Drop Address" required>
+                    <input type="number" id="d-lat" placeholder="Drop Lat" step="any" required>
+                    <input type="number" id="d-lng" placeholder="Drop Lng" step="any" required>
+                    <button type="submit">Create Order</button>
+                </form>
+            </div>
+            <div>
+                <h3>Live Couriers</h3>
+                <div id="admin-map" class="map-container"></div>
+            </div>
+        </div>
+
+        <h3>All Orders</h3>
+        <table id="all-orders-table">
+            <thead>
+                <tr>
+                    <th>Tracking ID</th>
+                    <th>Status</th>
+                    <th>Courier</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
