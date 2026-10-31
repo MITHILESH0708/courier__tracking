@@ -39,7 +39,7 @@ const loadOrders = async () => {
             </td>
             <td>
                 <button onclick="updateStatus('${order._id}')" ${isDelivered ? 'disabled' : ''}>Update Status</button>
-                <button class="btn-secondary" onclick="simMove('${order._id}', ${order.pickup.lat}, ${order.pickup.lng}, ${order.drop.lat}, ${order.drop.lng})">Simulate GPS</button>
+                <button class="btn-secondary" onclick="simMove('${order._id}', '${order.status}', ${order.pickup.lat}, ${order.pickup.lng}, ${order.drop.lat}, ${order.drop.lng})">Simulate GPS</button>
             </td>
         `;
         tbody.appendChild(tr);
@@ -69,29 +69,46 @@ const getCourierId = () => {
 };
 
 // Simulate moving from pickup towards drop
-const simMove = (orderId, pLat, pLng, dLat, dLng) => {
-    if(simInterval) clearInterval(simInterval);
-    alert('Started simulated movement towards destination.');
+const simMove = (orderId, status, pLat, pLng, dLat, dLng) => {
+    if (status === 'placed') {
+        alert('Please update the order status to "Picked Up" first before simulating GPS movement.');
+        return;
+    }
+    if (status === 'delivered') {
+        alert('This order has already been delivered.');
+        return;
+    }
+
+    if (simInterval) clearInterval(simInterval);
+    alert('Started simulated movement towards destination. Keep this Courier tab open while watching the Tracking tab!');
 
     let currentLat = pLat;
     let currentLng = pLng;
     const courierId = getCourierId();
 
     simInterval = setInterval(() => {
-        // Move 10% closer every tick
-        currentLat += (dLat - currentLat) * 0.1;
-        currentLng += (dLng - currentLng) * 0.1;
+        // Move 15% closer every tick across both latitude and longitude
+        currentLat += (dLat - currentLat) * 0.15;
+        currentLng += (dLng - currentLng) * 0.15;
+
+        // Check total 2D distance (both lat AND lng)
+        const distanceRemaining = Math.hypot(dLat - currentLat, dLng - currentLng);
+
+        if (distanceRemaining < 0.001) {
+            currentLat = dLat;
+            currentLng = dLng;
+            socket.emit('courier:location', {
+                orderId, courierId, lat: currentLat, lng: currentLng
+            });
+            clearInterval(simInterval);
+            alert('Arrived at destination!');
+            return;
+        }
 
         socket.emit('courier:location', {
             orderId, courierId, lat: currentLat, lng: currentLng
         });
-
-        // Stop if very close
-        if(Math.abs(dLat - currentLat) < 0.001) {
-            clearInterval(simInterval);
-            alert('Arrived at destination');
-        }
-    }, 5000); // 5 seconds
+    }, 2000); // Updates every 2 seconds for smooth live tracking
 };
 
 window.onload = loadOrders;
