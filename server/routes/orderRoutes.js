@@ -3,6 +3,8 @@ const Order = require('../models/Order');
 const { protect, authorize } = require('../middleware/auth');
 const router = express.Router();
 
+const STATUS_ORDER = ['placed', 'picked_up', 'in_transit', 'out_for_delivery', 'delivered'];
+
 // Public: Track an order by ID
 router.get('/track/:trackingId', async (req, res) => {
     try {
@@ -40,8 +42,8 @@ router.get('/', protect, authorize('admin'), async (req, res) => {
 router.put('/:id/assign', protect, authorize('admin'), async (req, res) => {
     try {
         const order = await Order.findByIdAndUpdate(
-            req.params.id, 
-            { courier: req.body.courierId }, 
+            req.params.id,
+            { courier: req.body.courierId },
             { new: true }
         ).populate('courier', 'name');
         res.json(order);
@@ -60,11 +62,23 @@ router.get('/my', protect, authorize('courier'), async (req, res) => {
     }
 });
 
-// Courier: Update status
+// Courier: Update status in strict sequence
 router.put('/:id/status', protect, authorize('courier'), async (req, res) => {
     try {
         const order = await Order.findOne({ _id: req.params.id, courier: req.user.id });
         if (!order) return res.status(404).json({ message: 'Order not found' });
+
+        const currentIndex = STATUS_ORDER.indexOf(order.status);
+        const nextIndex = STATUS_ORDER.indexOf(req.body.status);
+
+        if (nextIndex !== currentIndex + 1) {
+            const expectedNext = STATUS_ORDER[currentIndex + 1]
+                ? STATUS_ORDER[currentIndex + 1].replace(/_/g, ' ').toUpperCase()
+                : 'NONE (Order already delivered)';
+            return res.status(400).json({
+                message: `Cannot skip steps. Next status must be: ${expectedNext}`
+            });
+        }
 
         order.status = req.body.status;
         order.statusHistory.push({ status: req.body.status, time: new Date() });
